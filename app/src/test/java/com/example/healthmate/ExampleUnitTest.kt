@@ -1,4 +1,4 @@
-package com.example.helthmate
+package com.example.healthmate
 
 import org.junit.Test
 
