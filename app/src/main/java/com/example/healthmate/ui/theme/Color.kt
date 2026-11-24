@@ -1,4 +1,4 @@
-package com.example.helthmate.ui.theme
+package com.example.healthmate.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

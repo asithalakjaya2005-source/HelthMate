@@ -1,4 +1,5 @@
-package com.example.helthmate
+
+package com.example.healthmate
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,15 +12,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.helthmate.ui.theme.HelthMateTheme
+import com.example.healthmate.ui.theme.HealthMateTheme
+
+
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
-            HelthMateTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            HealthMateTheme {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
@@ -31,7 +40,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(
+    name: String,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = "Hello $name!",
         modifier = modifier
@@ -41,7 +53,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    HelthMateTheme {
-        Greeting("Android")
+    HealthMateTheme {
+        Greeting(name = "Android")
     }
 }
