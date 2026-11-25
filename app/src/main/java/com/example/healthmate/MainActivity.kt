@@ -57,6 +57,9 @@ class MainActivity : ComponentActivity() {
 
                         DashboardScreen(
                             totalRecords = records.size,
+                            totalSteps = records.sumOf { it.steps },
+                            totalCalories = records.sumOf { it.calories },
+                            totalWater = records.sumOf { it.water },
 
                             onAddRecord = {
                                 currentScreen = "addRecord"
