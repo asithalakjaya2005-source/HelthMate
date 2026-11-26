@@ -1,4 +1,3 @@
-
 package com.example.healthmate.data.repository
 
 import com.example.healthmate.data.local.HealthRecordDao
@@ -9,26 +8,83 @@ class HealthRepository(
     private val dao: HealthRecordDao
 ) {
 
-    val allRecords: Flow<List<HealthRecord>> =
-        dao.getAllRecords()
+    fun getAllRecords(
+        userId: Int
+    ): Flow<List<HealthRecord>> {
 
-    suspend fun insert(record: HealthRecord) {
-        dao.insertRecord(record)
+        require(userId > 0)
+
+        return dao.getAllRecords(userId)
     }
 
-    suspend fun update(record: HealthRecord) {
-        dao.updateRecord(record)
+    suspend fun insert(
+        record: HealthRecord,
+        userId: Int
+    ) {
+
+        require(userId > 0)
+
+        dao.insertRecord(
+            record.copy(
+                id = 0,
+                userId = userId
+            )
+        )
     }
 
-    suspend fun delete(record: HealthRecord) {
-        dao.deleteRecord(record)
+    suspend fun update(
+        record: HealthRecord,
+        userId: Int
+    ) {
+
+        require(userId > 0)
+
+        dao.updateRecord(
+            id = record.id,
+            userId = userId,
+            date = record.date,
+            steps = record.steps,
+            calories = record.calories,
+            water = record.water
+        )
     }
 
-    fun searchByDate(date: String): Flow<List<HealthRecord>> {
-        return dao.getRecordsByDate(date)
+    suspend fun delete(
+        record: HealthRecord,
+        userId: Int
+    ) {
+
+        require(userId > 0)
+
+        dao.deleteRecord(
+            id = record.id,
+            userId = userId
+        )
     }
 
-    suspend fun getById(id: Int): HealthRecord? {
-        return dao.getRecordById(id)
+    fun searchByDate(
+        date: String,
+        userId: Int
+    ): Flow<List<HealthRecord>> {
+
+        require(userId > 0)
+
+        return dao.getRecordsByDate(
+            date = date,
+            userId = userId
+        )
+    }
+
+    suspend fun getById(
+        id: Int,
+        userId: Int
+    ): HealthRecord? {
+
+        require(userId > 0)
+
+        return dao.getRecordById(
+            id = id,
+            userId = userId
+        )
     }
 }

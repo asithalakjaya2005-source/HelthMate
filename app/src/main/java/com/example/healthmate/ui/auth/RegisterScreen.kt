@@ -9,13 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthmate.ui.theme.HealthMateTheme
 
 @Composable
 fun RegisterScreen(
@@ -23,8 +23,8 @@ fun RegisterScreen(
     onBackToLogin: () -> Unit,
     errorMessage: String = ""
 ) {
-    val primaryColor = Color(0xFF00796B)
-    val backgroundColor = Color(0xFFF0F5F4)
+
+    val colors = MaterialTheme.colorScheme
 
     var fullName by remember {
         mutableStateOf("")
@@ -50,10 +50,20 @@ fun RegisterScreen(
         mutableStateOf("")
     }
 
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = colors.primary,
+        focusedLabelColor = colors.primary,
+        cursorColor = colors.primary,
+        unfocusedBorderColor = colors.outline,
+        focusedTextColor = colors.onBackground,
+        unfocusedTextColor = colors.onBackground,
+        unfocusedLabelColor = colors.onSurfaceVariant
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(colors.background)
             .safeDrawingPadding()
             .imePadding()
             .verticalScroll(rememberScrollState())
@@ -67,7 +77,7 @@ fun RegisterScreen(
             modifier = Modifier.size(75.dp),
             shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
-                containerColor = primaryColor
+                containerColor = colors.primary
             )
         ) {
             Box(
@@ -77,7 +87,7 @@ fun RegisterScreen(
                 Text(
                     text = "♥",
                     fontSize = 42.sp,
-                    color = Color.White
+                    color = colors.onPrimary
                 )
             }
         }
@@ -88,13 +98,13 @@ fun RegisterScreen(
             text = "HealthMate",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "Your Personal Health Companion",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(28.dp))
@@ -103,7 +113,7 @@ fun RegisterScreen(
             text = "Create Account",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF263238),
+            color = colors.onBackground,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -112,7 +122,7 @@ fun RegisterScreen(
         Text(
             text = "Start your health journey today",
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = colors.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -124,10 +134,13 @@ fun RegisterScreen(
                 fullName = it
                 validationError = ""
             },
-            label = { Text("Full Name") },
+            label = {
+                Text("Full Name")
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -138,10 +151,13 @@ fun RegisterScreen(
                 username = it
                 validationError = ""
             },
-            label = { Text("Username") },
+            label = {
+                Text("Username")
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -152,7 +168,9 @@ fun RegisterScreen(
                 password = it
                 validationError = ""
             },
-            label = { Text("Password") },
+            label = {
+                Text("Password")
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -176,10 +194,12 @@ fun RegisterScreen(
                         } else {
                             "Show"
                         },
-                        color = primaryColor
+                        color = colors.primary
                     )
                 }
-            }
+            },
+
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -190,7 +210,9 @@ fun RegisterScreen(
                 confirmPassword = it
                 validationError = ""
             },
-            label = { Text("Confirm Password") },
+            label = {
+                Text("Confirm Password")
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -200,7 +222,9 @@ fun RegisterScreen(
                     VisualTransformation.None
                 } else {
                     PasswordVisualTransformation()
-                }
+                },
+
+            colors = textFieldColors
         )
 
         val displayedError =
@@ -212,7 +236,7 @@ fun RegisterScreen(
 
             Text(
                 text = displayedError,
-                color = Color.Red,
+                color = colors.error,
                 fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -280,15 +304,15 @@ fun RegisterScreen(
             shape = RoundedCornerShape(12.dp),
 
             colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary
             )
 
         ) {
             Text(
                 text = "Create Account",
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -297,7 +321,7 @@ fun RegisterScreen(
         Text(
             text = "Already have an account?",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         TextButton(
@@ -307,7 +331,7 @@ fun RegisterScreen(
                 text = "Back to Login",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = primaryColor
+                color = colors.primary
             )
         }
 
@@ -316,16 +340,35 @@ fun RegisterScreen(
         Text(
             text = "Your health, your priority.",
             fontSize = 13.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
 @Composable
 fun RegisterScreenPreview() {
 
-    MaterialTheme {
+    HealthMateTheme(darkTheme = false) {
+
+        RegisterScreen(
+            onRegister = { _, _, _ -> },
+            onBackToLogin = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun RegisterScreenDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
 
         RegisterScreen(
             onRegister = { _, _, _ -> },

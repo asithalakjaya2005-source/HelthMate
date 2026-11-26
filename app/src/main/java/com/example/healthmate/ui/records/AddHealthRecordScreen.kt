@@ -9,13 +9,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthmate.data.model.HealthRecord
+import com.example.healthmate.ui.theme.HealthMateTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -26,6 +26,8 @@ fun AddHealthRecordScreen(
     onBack: () -> Unit = {}
 ) {
 
+    val colors = MaterialTheme.colorScheme
+
     var date by remember {
         mutableStateOf(
             SimpleDateFormat(
@@ -35,26 +37,48 @@ fun AddHealthRecordScreen(
         )
     }
 
-    var steps by remember { mutableStateOf("") }
-    var calories by remember { mutableStateOf("") }
-    var water by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    var steps by remember {
+        mutableStateOf("")
+    }
 
-    val primaryColor = Color(0xFF00796B)
+    var calories by remember {
+        mutableStateOf("")
+    }
+
+    var water by remember {
+        mutableStateOf("")
+    }
+
+    var errorMessage by remember {
+        mutableStateOf("")
+    }
+
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = colors.primary,
+        focusedLabelColor = colors.primary,
+        cursorColor = colors.primary,
+        unfocusedBorderColor = colors.outline,
+        focusedTextColor = colors.onSurface,
+        unfocusedTextColor = colors.onSurface,
+        unfocusedLabelColor = colors.onSurfaceVariant
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF4F8F7))
+            .background(colors.background)
             .safeDrawingPadding()
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {
 
-        TextButton(onClick = onBack) {
+        TextButton(
+            onClick = onBack
+        ) {
             Text(
                 text = "< Back",
-                color = primaryColor
+                color = colors.primary
             )
         }
 
@@ -62,13 +86,13 @@ fun AddHealthRecordScreen(
             text = "Add Health Record",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "Enter your daily health information",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -77,7 +101,8 @@ fun AddHealthRecordScreen(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = colors.surface,
+                contentColor = colors.onSurface
             )
         ) {
 
@@ -87,50 +112,72 @@ fun AddHealthRecordScreen(
 
                 OutlinedTextField(
                     value = date,
-                    onValueChange = { date = it },
-                    label = { Text("Date") },
-                    placeholder = { Text("YYYY-MM-DD") },
+                    onValueChange = {
+                        date = it
+                    },
+                    label = {
+                        Text("Date")
+                    },
+                    placeholder = {
+                        Text("YYYY-MM-DD")
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = steps,
-                    onValueChange = { steps = it },
-                    label = { Text("Steps") },
+                    onValueChange = {
+                        steps = it
+                    },
+                    label = {
+                        Text("Steps")
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = calories,
-                    onValueChange = { calories = it },
-                    label = { Text("Calories (kcal)") },
+                    onValueChange = {
+                        calories = it
+                    },
+                    label = {
+                        Text("Calories (kcal)")
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = water,
-                    onValueChange = { water = it },
-                    label = { Text("Water Intake (ml)") },
+                    onValueChange = {
+                        water = it
+                    },
+                    label = {
+                        Text("Water Intake (ml)")
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 if (errorMessage.isNotEmpty()) {
@@ -139,7 +186,7 @@ fun AddHealthRecordScreen(
 
                     Text(
                         text = errorMessage,
-                        color = Color.Red,
+                        color = colors.error,
                         fontSize = 14.sp
                     )
                 }
@@ -154,17 +201,21 @@ fun AddHealthRecordScreen(
                         val waterValue = water.toIntOrNull()
 
                         val validDate = try {
+
                             val formatter = SimpleDateFormat(
                                 "yyyy-MM-dd",
                                 Locale.US
                             )
+
                             formatter.isLenient = false
 
                             val parsedDate = formatter.parse(date)
 
                             parsedDate != null &&
                                     formatter.format(parsedDate) == date
+
                         } catch (e: Exception) {
+
                             false
                         }
 
@@ -174,6 +225,7 @@ fun AddHealthRecordScreen(
                             calories.isBlank() ||
                             water.isBlank()
                         ) {
+
                             errorMessage =
                                 "Please fill in all fields."
 
@@ -190,6 +242,7 @@ fun AddHealthRecordScreen(
                             caloriesValue < 0 ||
                             waterValue < 0
                         ) {
+
                             errorMessage =
                                 "Please enter valid positive or zero values."
 
@@ -207,14 +260,20 @@ fun AddHealthRecordScreen(
                             onSave(record)
                         }
                     },
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+
                     shape = RoundedCornerShape(12.dp),
+
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = primaryColor
+                        containerColor = colors.primary,
+                        contentColor = colors.onPrimary
                     )
+
                 ) {
+
                     Text(
                         text = "Save Health Record",
                         fontSize = 16.sp
@@ -225,10 +284,28 @@ fun AddHealthRecordScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
 @Composable
 fun AddHealthRecordPreview() {
-    MaterialTheme {
+
+    HealthMateTheme(darkTheme = false) {
+
+        AddHealthRecordScreen()
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun AddHealthRecordDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
+
         AddHealthRecordScreen()
     }
 }

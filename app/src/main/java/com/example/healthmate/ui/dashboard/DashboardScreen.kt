@@ -7,12 +7,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthmate.ui.theme.HealthMateTheme
 
 @Composable
 fun DashboardScreen(
@@ -21,31 +22,56 @@ fun DashboardScreen(
     totalCalories: Int = 0,
     totalWater: Int = 0,
     onAddRecord: () -> Unit = {},
-    onViewRecords: () -> Unit = {}
+    onViewRecords: () -> Unit = {},
+    userName: String = "User",
+    onViewProgress: () -> Unit = {},
+    onLogout: () -> Unit = {},
+    darkMode: Boolean = false,
+    onThemeToggle: () -> Unit = {}
 ) {
-    val primaryColor = Color(0xFF00796B)
-    val backgroundColor = Color(0xFFF0F5F4)
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(colors.background)
             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {
-        Text(
-            text = "HealthMate",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = primaryColor
-        )
 
-        Text(
-            text = "Your Personal Health Companion",
-            fontSize = 14.sp,
-            color = Color.Gray
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = "HealthMate",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.primary
+                )
+
+                Text(
+                    text = "Your Personal Health Companion",
+                    fontSize = 14.sp,
+                    color = colors.onSurfaceVariant
+                )
+            }
+
+            IconButton(
+                onClick = onThemeToggle
+            ) {
+                Text(
+                    text = if (darkMode) "☀️" else "🌙",
+                    fontSize = 26.sp
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -53,17 +79,18 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(
-                containerColor = primaryColor
+                containerColor = colors.primary
             )
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
             ) {
+
                 Text(
-                    text = "Welcome to HealthMate!",
+                    text = "Welcome, $userName!",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = colors.onPrimary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -71,7 +98,7 @@ fun DashboardScreen(
                 Text(
                     text = "Track your health and manage your daily health records.",
                     fontSize = 15.sp,
-                    color = Color.White
+                    color = colors.onPrimary
                 )
             }
         }
@@ -82,7 +109,7 @@ fun DashboardScreen(
             text = "Health Overview",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF263238)
+            color = colors.onBackground
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -90,7 +117,7 @@ fun DashboardScreen(
         Text(
             text = "Summary of all saved records",
             fontSize = 13.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -99,6 +126,7 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             HealthSummaryCard(
                 title = "Total Steps",
                 value = "%,d".format(totalSteps),
@@ -120,6 +148,7 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             HealthSummaryCard(
                 title = "Water Intake",
                 value = "%,d ml".format(totalWater),
@@ -141,7 +170,7 @@ fun DashboardScreen(
             text = "Quick Actions",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF263238)
+            color = colors.onBackground
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -151,15 +180,11 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(54.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
-            )
+            shape = RoundedCornerShape(10.dp)
         ) {
             Text(
                 text = "+ Add Health Record",
-                fontSize = 16.sp,
-                color = Color.White
+                fontSize = 16.sp
             )
         }
 
@@ -174,8 +199,38 @@ fun DashboardScreen(
         ) {
             Text(
                 text = "View Health Records",
+                fontSize = 16.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onViewProgress,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text = "View Health Progress",
+                fontSize = 16.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text = "Logout",
                 fontSize = 16.sp,
-                color = primaryColor
+                color = colors.error
             )
         }
 
@@ -184,7 +239,7 @@ fun DashboardScreen(
         Text(
             text = "Your health, your priority.",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
     }
 }
@@ -196,11 +251,13 @@ private fun HealthSummaryCard(
     symbol: String,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.heightIn(min = 140.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = colors.surface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -219,7 +276,7 @@ private fun HealthSummaryCard(
             Text(
                 text = title,
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = colors.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -228,7 +285,7 @@ private fun HealthSummaryCard(
                 text = value,
                 fontSize = 21.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF00796B)
+                color = colors.primary
             )
         }
     }
@@ -236,13 +293,30 @@ private fun HealthSummaryCard(
 
 @Preview(showBackground = true)
 @Composable
-fun DashboardPreview() {
-    MaterialTheme {
+fun DashboardLightPreview() {
+    HealthMateTheme(darkTheme = false) {
         DashboardScreen(
+            userName = "User",
             totalRecords = 1,
             totalSteps = 8500,
             totalCalories = 500,
-            totalWater = 2500
+            totalWater = 2500,
+            darkMode = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardDarkPreview() {
+    HealthMateTheme(darkTheme = true) {
+        DashboardScreen(
+            userName = "User",
+            totalRecords = 1,
+            totalSteps = 8500,
+            totalCalories = 500,
+            totalWater = 2500,
+            darkMode = true
         )
     }
 }

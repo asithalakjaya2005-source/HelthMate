@@ -8,11 +8,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthmate.data.model.HealthRecord
+import com.example.healthmate.ui.theme.HealthMateTheme
 
 @Composable
 fun HealthRecordsScreen(
@@ -21,7 +22,8 @@ fun HealthRecordsScreen(
     onEdit: (HealthRecord) -> Unit,
     onDelete: (HealthRecord) -> Unit
 ) {
-    val primaryColor = Color(0xFF00796B)
+
+    val colors = MaterialTheme.colorScheme
 
     var recordToDelete by remember {
         mutableStateOf<HealthRecord?>(null)
@@ -30,7 +32,7 @@ fun HealthRecordsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF0F6F5))
+            .background(colors.background)
             .safeDrawingPadding()
             .padding(20.dp)
     ) {
@@ -39,25 +41,27 @@ fun HealthRecordsScreen(
             text = "Health Records",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "View your daily health information",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "Total Records: ${records.size}",
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = colors.onBackground
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (records.isEmpty()) {
+
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -65,10 +69,12 @@ fun HealthRecordsScreen(
             ) {
                 Text(
                     text = "No health records available.",
-                    color = Color.Gray
+                    color = colors.onSurfaceVariant
                 )
             }
+
         } else {
+
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement =
@@ -83,13 +89,15 @@ fun HealthRecordsScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
+
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White
+                            containerColor = colors.surface,
+                            contentColor = colors.onSurface
                         ),
-                        elevation =
-                            CardDefaults.cardElevation(
-                                defaultElevation = 2.dp
-                            )
+
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 2.dp
+                        )
                     ) {
 
                         Column(
@@ -100,28 +108,35 @@ fun HealthRecordsScreen(
                                 text = "Date: ${record.date}",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = primaryColor
+                                color = colors.primary
                             )
 
                             Spacer(
                                 modifier = Modifier.height(12.dp)
                             )
 
-                            Text("Steps: ${record.steps}")
+                            Text(
+                                text = "Steps: ${record.steps}",
+                                color = colors.onSurface
+                            )
 
                             Spacer(
                                 modifier = Modifier.height(6.dp)
                             )
 
                             Text(
-                                "Calories: ${record.calories} kcal"
+                                text = "Calories: ${record.calories} kcal",
+                                color = colors.onSurface
                             )
 
                             Spacer(
                                 modifier = Modifier.height(6.dp)
                             )
 
-                            Text("Water: ${record.water} ml")
+                            Text(
+                                text = "Water: ${record.water} ml",
+                                color = colors.onSurface
+                            )
 
                             Spacer(
                                 modifier = Modifier.height(16.dp)
@@ -136,10 +151,12 @@ fun HealthRecordsScreen(
                                     onClick = {
                                         onEdit(record)
                                     },
+
                                     modifier = Modifier.weight(1f),
+
                                     colors =
                                         ButtonDefaults.outlinedButtonColors(
-                                            contentColor = primaryColor
+                                            contentColor = colors.primary
                                         )
                                 ) {
                                     Text("Edit")
@@ -149,10 +166,12 @@ fun HealthRecordsScreen(
                                     onClick = {
                                         recordToDelete = record
                                     },
+
                                     modifier = Modifier.weight(1f),
+
                                     colors =
                                         ButtonDefaults.outlinedButtonColors(
-                                            contentColor = Color.Red
+                                            contentColor = colors.error
                                         )
                                 ) {
                                     Text("Delete")
@@ -168,12 +187,16 @@ fun HealthRecordsScreen(
 
         Button(
             onClick = onBack,
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
+
             shape = RoundedCornerShape(10.dp),
+
             colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary
             )
         ) {
             Text("Back to Dashboard")
@@ -186,15 +209,23 @@ fun HealthRecordsScreen(
             onDismissRequest = {
                 recordToDelete = null
             },
+
+            containerColor = colors.surface,
+            titleContentColor = colors.onSurface,
+            textContentColor = colors.onSurfaceVariant,
+
             title = {
                 Text("Delete Health Record")
             },
+
             text = {
                 Text(
                     "Are you sure you want to delete this health record?"
                 )
             },
+
             confirmButton = {
+
                 TextButton(
                     onClick = {
                         onDelete(record)
@@ -203,19 +234,74 @@ fun HealthRecordsScreen(
                 ) {
                     Text(
                         text = "Delete",
-                        color = Color.Red
+                        color = colors.error
                     )
                 }
             },
+
             dismissButton = {
+
                 TextButton(
                     onClick = {
                         recordToDelete = null
                     }
                 ) {
-                    Text("Cancel")
+                    Text(
+                        text = "Cancel",
+                        color = colors.primary
+                    )
                 }
             }
+        )
+    }
+}
+
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
+@Composable
+fun HealthRecordsLightPreview() {
+
+    HealthMateTheme(darkTheme = false) {
+
+        HealthRecordsScreen(
+            records = listOf(
+                HealthRecord(
+                    date = "2026-11-26",
+                    steps = 8500,
+                    calories = 500,
+                    water = 2500
+                )
+            ),
+            onBack = {},
+            onEdit = {},
+            onDelete = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun HealthRecordsDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
+
+        HealthRecordsScreen(
+            records = listOf(
+                HealthRecord(
+                    date = "2026-11-26",
+                    steps = 8500,
+                    calories = 500,
+                    water = 2500
+                )
+            ),
+            onBack = {},
+            onEdit = {},
+            onDelete = {}
         )
     }
 }

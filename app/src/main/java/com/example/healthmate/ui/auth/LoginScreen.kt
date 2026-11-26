@@ -9,13 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthmate.ui.theme.HealthMateTheme
 
 @Composable
 fun LoginScreen(
@@ -23,8 +23,8 @@ fun LoginScreen(
     onCreateAccount: () -> Unit,
     errorMessage: String = ""
 ) {
-    val primaryColor = Color(0xFF00796B)
-    val backgroundColor = Color(0xFFF0F5F4)
+
+    val colors = MaterialTheme.colorScheme
 
     var username by remember {
         mutableStateOf("")
@@ -45,7 +45,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(colors.background)
             .safeDrawingPadding()
             .imePadding()
             .verticalScroll(rememberScrollState())
@@ -59,7 +59,7 @@ fun LoginScreen(
             modifier = Modifier.size(85.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = primaryColor
+                containerColor = colors.primary
             )
         ) {
             Box(
@@ -69,7 +69,7 @@ fun LoginScreen(
                 Text(
                     text = "♥",
                     fontSize = 48.sp,
-                    color = Color.White
+                    color = colors.onPrimary
                 )
             }
         }
@@ -80,13 +80,13 @@ fun LoginScreen(
             text = "HealthMate",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "Your Personal Health Companion",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -95,7 +95,7 @@ fun LoginScreen(
             text = "Welcome Back!",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF263238),
+            color = colors.onBackground,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -104,7 +104,7 @@ fun LoginScreen(
         Text(
             text = "Login to your account",
             fontSize = 15.sp,
-            color = Color.Gray,
+            color = colors.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -123,9 +123,13 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = primaryColor,
-                focusedLabelColor = primaryColor,
-                cursorColor = primaryColor
+                focusedBorderColor = colors.primary,
+                focusedLabelColor = colors.primary,
+                cursorColor = colors.primary,
+                unfocusedBorderColor = colors.outline,
+                focusedTextColor = colors.onBackground,
+                unfocusedTextColor = colors.onBackground,
+                unfocusedLabelColor = colors.onSurfaceVariant
             )
         )
 
@@ -163,15 +167,19 @@ fun LoginScreen(
                         } else {
                             "Show"
                         },
-                        color = primaryColor
+                        color = colors.primary
                     )
                 }
             },
 
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = primaryColor,
-                focusedLabelColor = primaryColor,
-                cursorColor = primaryColor
+                focusedBorderColor = colors.primary,
+                focusedLabelColor = colors.primary,
+                cursorColor = colors.primary,
+                unfocusedBorderColor = colors.outline,
+                focusedTextColor = colors.onBackground,
+                unfocusedTextColor = colors.onBackground,
+                unfocusedLabelColor = colors.onSurfaceVariant
             )
         )
 
@@ -184,7 +192,7 @@ fun LoginScreen(
 
             Text(
                 text = displayedError,
-                color = Color.Red,
+                color = colors.error,
                 fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -220,14 +228,14 @@ fun LoginScreen(
                 .height(54.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary
             )
         ) {
             Text(
                 text = "Login",
                 fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -236,7 +244,7 @@ fun LoginScreen(
         Text(
             text = "Don't have an account?",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         TextButton(
@@ -246,7 +254,7 @@ fun LoginScreen(
                 text = "Create Account",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = primaryColor
+                color = colors.primary
             )
         }
 
@@ -255,16 +263,36 @@ fun LoginScreen(
         Text(
             text = "Your health, your priority.",
             fontSize = 13.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
 @Composable
 fun LoginScreenPreview() {
 
-    MaterialTheme {
+    HealthMateTheme(darkTheme = false) {
+
+        LoginScreen(
+            onLogin = { _, _ -> },
+            onCreateAccount = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun LoginScreenDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
+
         LoginScreen(
             onLogin = { _, _ -> },
             onCreateAccount = {}

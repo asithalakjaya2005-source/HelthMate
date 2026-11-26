@@ -14,18 +14,37 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthmate.data.model.HealthRecord
+import com.example.healthmate.ui.theme.HealthMateTheme
 
 @Composable
 fun HealthProgressScreen(
     records: List<HealthRecord>,
     onBack: () -> Unit
 ) {
-    val primaryColor = Color(0xFF00796B)
-    val backgroundColor = Color(0xFFEFF5F4)
+
+    val colors = MaterialTheme.colorScheme
+
+    val isDarkTheme = colors.background.luminance() < 0.5f
+
+    val stepsColor = colors.primary
+
+    val caloriesColor = if (isDarkTheme) {
+        Color(0xFFFFB74D)
+    } else {
+        Color(0xFFC65D00)
+    }
+
+    val waterColor = if (isDarkTheme) {
+        Color(0xFF64B5F6)
+    } else {
+        Color(0xFF1565C0)
+    }
 
     val sortedRecords = records
         .sortedBy { it.date }
@@ -34,8 +53,8 @@ fun HealthProgressScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
-            .systemBarsPadding()
+            .background(colors.background)
+            .safeDrawingPadding()
             .padding(20.dp)
     ) {
 
@@ -43,13 +62,13 @@ fun HealthProgressScreen(
             text = "Health Progress",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "Track your health activity over time",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -65,7 +84,7 @@ fun HealthProgressScreen(
 
                 Text(
                     text = "No health records available.",
-                    color = Color.Gray,
+                    color = colors.onSurfaceVariant,
                     fontSize = 16.sp
                 )
 
@@ -74,37 +93,44 @@ fun HealthProgressScreen(
                 Text(
                     text = "Latest 7 Health Records",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = colors.onBackground
                 )
 
                 ProgressChartCard(
                     title = "👣 Steps Progress",
-                    values = sortedRecords.map { it.steps },
+                    values = sortedRecords.map {
+                        it.steps
+                    },
                     labels = sortedRecords.map {
                         it.date.takeLast(5)
                     },
-                    chartColor = primaryColor,
+                    chartColor = stepsColor,
                     unit = "steps"
                 )
 
                 ProgressChartCard(
                     title = "🔥 Calories Progress",
-                    values = sortedRecords.map { it.calories },
+                    values = sortedRecords.map {
+                        it.calories
+                    },
                     labels = sortedRecords.map {
                         it.date.takeLast(5)
                     },
-                    chartColor = Color(0xFFF57C00),
+                    chartColor = caloriesColor,
                     unit = "kcal",
                     lineChart = true
                 )
 
                 ProgressChartCard(
                     title = "💧 Water Intake Progress",
-                    values = sortedRecords.map { it.water },
+                    values = sortedRecords.map {
+                        it.water
+                    },
                     labels = sortedRecords.map {
                         it.date.takeLast(5)
                     },
-                    chartColor = Color(0xFF2196F3),
+                    chartColor = waterColor,
                     unit = "ml"
                 )
             }
@@ -114,14 +140,20 @@ fun HealthProgressScreen(
 
         Button(
             onClick = onBack,
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+
             shape = RoundedCornerShape(10.dp),
+
             colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary
             )
+
         ) {
+
             Text("Back to Dashboard")
         }
     }
@@ -137,15 +169,25 @@ private fun ProgressChartCard(
     lineChart: Boolean = false
 ) {
 
+    val colors = MaterialTheme.colorScheme
+
+    val gridColor = colors.outline.copy(
+        alpha = 0.35f
+    )
+
     val maxValue = (values.maxOrNull() ?: 1)
         .coerceAtLeast(1)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+
         shape = RoundedCornerShape(16.dp),
+
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = colors.surface,
+            contentColor = colors.onSurface
         ),
+
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
         )
@@ -167,7 +209,7 @@ private fun ProgressChartCard(
             Text(
                 text = "Highest: ${values.maxOrNull() ?: 0} $unit",
                 fontSize = 13.sp,
-                color = Color.Gray
+                color = colors.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -180,18 +222,24 @@ private fun ProgressChartCard(
 
                 if (values.isNotEmpty()) {
 
-                    val slotWidth = size.width / values.size
-                    val barWidth = slotWidth * 0.55f
-                    val chartHeight = size.height - 12.dp.toPx()
+                    val slotWidth =
+                        size.width / values.size
+
+                    val barWidth =
+                        slotWidth * 0.55f
+
+                    val chartHeight =
+                        size.height - 12.dp.toPx()
 
                     // Draw horizontal grid lines
+
                     for (i in 0..4) {
 
                         val y = size.height -
                                 (chartHeight * i / 4f)
 
                         drawLine(
-                            color = Color(0xFFE0E0E0),
+                            color = gridColor,
                             start = Offset(0f, y),
                             end = Offset(size.width, y),
                             strokeWidth = 1.dp.toPx()
@@ -200,14 +248,17 @@ private fun ProgressChartCard(
 
                     if (lineChart) {
 
-                        val points = values.mapIndexed { index, value ->
+                        val points = values.mapIndexed {
+                                index, value ->
 
                             val x = slotWidth * index +
                                     slotWidth / 2
 
                             val y = size.height -
-                                    (value.coerceAtLeast(0).toFloat() /
-                                            maxValue) * chartHeight
+                                    (
+                                            value.coerceAtLeast(0)
+                                                .toFloat() / maxValue
+                                            ) * chartHeight
 
                             Offset(x, y)
                         }
@@ -233,25 +284,31 @@ private fun ProgressChartCard(
 
                     } else {
 
-                        values.forEachIndexed { index, value ->
+                        values.forEachIndexed {
+                                index, value ->
 
                             val barHeight =
-                                (value.coerceAtLeast(0).toFloat() /
-                                        maxValue) * chartHeight
+                                (
+                                        value.coerceAtLeast(0)
+                                            .toFloat() / maxValue
+                                        ) * chartHeight
 
                             val x = slotWidth * index +
                                     (slotWidth - barWidth) / 2
 
                             drawRoundRect(
                                 color = chartColor,
+
                                 topLeft = Offset(
                                     x,
                                     size.height - barHeight
                                 ),
+
                                 size = Size(
                                     barWidth,
                                     barHeight
                                 ),
+
                                 cornerRadius = CornerRadius(
                                     5.dp.toPx()
                                 )
@@ -277,11 +334,98 @@ private fun ProgressChartCard(
                         Text(
                             text = label,
                             fontSize = 10.sp,
-                            color = Color.Gray
+                            color = colors.onSurfaceVariant
                         )
                     }
                 }
             }
         }
+    }
+}
+
+private fun sampleProgressRecords(): List<HealthRecord> {
+
+    return listOf(
+
+        HealthRecord(
+            date = "2026-11-20",
+            steps = 4500,
+            calories = 300,
+            water = 1500
+        ),
+
+        HealthRecord(
+            date = "2026-11-21",
+            steps = 6000,
+            calories = 450,
+            water = 2000
+        ),
+
+        HealthRecord(
+            date = "2026-11-22",
+            steps = 5500,
+            calories = 350,
+            water = 1800
+        ),
+
+        HealthRecord(
+            date = "2026-11-23",
+            steps = 8000,
+            calories = 550,
+            water = 2500
+        ),
+
+        HealthRecord(
+            date = "2026-11-24",
+            steps = 7000,
+            calories = 400,
+            water = 2200
+        ),
+
+        HealthRecord(
+            date = "2026-11-25",
+            steps = 9000,
+            calories = 650,
+            water = 2800
+        ),
+
+        HealthRecord(
+            date = "2026-11-26",
+            steps = 8500,
+            calories = 500,
+            water = 2500
+        )
+    )
+}
+
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
+@Composable
+fun HealthProgressLightPreview() {
+
+    HealthMateTheme(darkTheme = false) {
+
+        HealthProgressScreen(
+            records = sampleProgressRecords(),
+            onBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun HealthProgressDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
+
+        HealthProgressScreen(
+            records = sampleProgressRecords(),
+            onBack = {}
+        )
     }
 }

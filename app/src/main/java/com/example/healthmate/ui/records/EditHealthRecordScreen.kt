@@ -9,12 +9,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthmate.data.model.HealthRecord
+import com.example.healthmate.ui.theme.HealthMateTheme
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun EditHealthRecordScreen(
@@ -22,6 +25,9 @@ fun EditHealthRecordScreen(
     onUpdate: (HealthRecord) -> Unit,
     onBack: () -> Unit
 ) {
+
+    val colors = MaterialTheme.colorScheme
+
     var date by remember(record.id) {
         mutableStateOf(record.date)
     }
@@ -42,12 +48,20 @@ fun EditHealthRecordScreen(
         mutableStateOf("")
     }
 
-    val primaryColor = Color(0xFF00796B)
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = colors.primary,
+        focusedLabelColor = colors.primary,
+        cursorColor = colors.primary,
+        unfocusedBorderColor = colors.outline,
+        focusedTextColor = colors.onBackground,
+        unfocusedTextColor = colors.onBackground,
+        unfocusedLabelColor = colors.onSurfaceVariant
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF0F6F5))
+            .background(colors.background)
             .safeDrawingPadding()
             .imePadding()
             .verticalScroll(rememberScrollState())
@@ -58,70 +72,91 @@ fun EditHealthRecordScreen(
             text = "Edit Health Record",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = colors.primary
         )
 
         Text(
             text = "Update your daily health information",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
             value = date,
-            onValueChange = { date = it },
-            label = { Text("Date (YYYY-MM-DD)") },
+            onValueChange = {
+                date = it
+            },
+            label = {
+                Text("Date (YYYY-MM-DD)")
+            },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = steps,
-            onValueChange = { steps = it },
-            label = { Text("Steps") },
+            onValueChange = {
+                steps = it
+            },
+            label = {
+                Text("Steps")
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = calories,
-            onValueChange = { calories = it },
-            label = { Text("Calories (kcal)") },
+            onValueChange = {
+                calories = it
+            },
+            label = {
+                Text("Calories (kcal)")
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = water,
-            onValueChange = { water = it },
-            label = { Text("Water (ml)") },
+            onValueChange = {
+                water = it
+            },
+            label = {
+                Text("Water (ml)")
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = textFieldColors
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (errorMessage.isNotEmpty()) {
+
             Text(
                 text = errorMessage,
-                color = Color.Red,
+                color = colors.error,
                 fontSize = 14.sp
             )
 
@@ -136,37 +171,48 @@ fun EditHealthRecordScreen(
                 val waterValue = water.toIntOrNull()
 
                 val validDate = try {
-                    val formatter = java.text.SimpleDateFormat(
+
+                    val formatter = SimpleDateFormat(
                         "yyyy-MM-dd",
-                        java.util.Locale.US
+                        Locale.US
                     )
+
                     formatter.isLenient = false
 
                     date.matches(
                         Regex("\\d{4}-\\d{2}-\\d{2}")
                     ) && formatter.parse(date) != null
+
                 } catch (e: Exception) {
+
                     false
                 }
 
                 if (!validDate) {
-                    errorMessage = "Enter a valid date (YYYY-MM-DD)."
+
+                    errorMessage =
+                        "Enter a valid date (YYYY-MM-DD)."
 
                 } else if (
                     stepsValue == null ||
                     caloriesValue == null ||
                     waterValue == null
                 ) {
-                    errorMessage = "Please enter valid numbers."
+
+                    errorMessage =
+                        "Please enter valid numbers."
 
                 } else if (
                     stepsValue < 0 ||
                     caloriesValue < 0 ||
                     waterValue < 0
                 ) {
-                    errorMessage = "Values cannot be negative."
+
+                    errorMessage =
+                        "Values cannot be negative."
 
                 } else {
+
                     errorMessage = ""
 
                     val updatedRecord = record.copy(
@@ -179,14 +225,20 @@ fun EditHealthRecordScreen(
                     onUpdate(updatedRecord)
                 }
             },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+
             shape = RoundedCornerShape(10.dp),
+
             colors = ButtonDefaults.buttonColors(
-                containerColor = primaryColor
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary
             )
+
         ) {
+
             Text("Update Record")
         }
 
@@ -194,15 +246,64 @@ fun EditHealthRecordScreen(
 
         OutlinedButton(
             onClick = onBack,
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+
             shape = RoundedCornerShape(10.dp),
+
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = primaryColor
+                contentColor = colors.primary
             )
+
         ) {
+
             Text("Cancel")
         }
+    }
+}
+
+@Preview(
+    name = "Light Mode",
+    showBackground = true
+)
+@Composable
+fun EditHealthRecordLightPreview() {
+
+    HealthMateTheme(darkTheme = false) {
+
+        EditHealthRecordScreen(
+            record = HealthRecord(
+                date = "2026-11-26",
+                steps = 8500,
+                calories = 500,
+                water = 2500
+            ),
+            onUpdate = {},
+            onBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true
+)
+@Composable
+fun EditHealthRecordDarkPreview() {
+
+    HealthMateTheme(darkTheme = true) {
+
+        EditHealthRecordScreen(
+            record = HealthRecord(
+                date = "2026-11-26",
+                steps = 8500,
+                calories = 500,
+                water = 2500
+            ),
+            onUpdate = {},
+            onBack = {}
+        )
     }
 }
