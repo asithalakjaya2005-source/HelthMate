@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthmate.data.model.HealthRecord
 import com.example.healthmate.ui.theme.HealthMateTheme
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun HealthRecordsScreen(
@@ -25,8 +27,30 @@ fun HealthRecordsScreen(
 
     val colors = MaterialTheme.colorScheme
 
+    var searchDate by remember {
+        mutableStateOf("")
+    }
+
+    var appliedDate by remember {
+        mutableStateOf("")
+    }
+
+    var searchError by remember {
+        mutableStateOf("")
+    }
+
     var recordToDelete by remember {
         mutableStateOf<HealthRecord?>(null)
+    }
+
+    val filteredRecords = remember(records, appliedDate) {
+        if (appliedDate.isBlank()) {
+            records
+        } else {
+            records.filter {
+                it.date == appliedDate
+            }
+        }
     }
 
     Column(
@@ -34,6 +58,7 @@ fun HealthRecordsScreen(
             .fillMaxSize()
             .background(colors.background)
             .safeDrawingPadding()
+            .imePadding()
             .padding(20.dp)
     ) {
 
@@ -50,17 +75,103 @@ fun HealthRecordsScreen(
             color = colors.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+
+        OutlinedTextField(
+            value = searchDate,
+            onValueChange = {
+                searchDate = it
+                searchError = ""
+            },
+            label = {
+                Text("Search by Date")
+            },
+            placeholder = {
+                Text("YYYY-MM-DD")
+            },
+            singleLine = true,
+            isError = searchError.isNotEmpty(),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        if (searchError.isNotEmpty()) {
+            Text(
+                text = searchError,
+                color = colors.error,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+
+            Button(
+                onClick = {
+                    val date = searchDate.trim()
+
+                    if (isValidSearchDate(date)) {
+                        appliedDate = date
+                        searchError = ""
+                    } else {
+                        searchError =
+                            "Enter a valid date (YYYY-MM-DD)"
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colors.primary,
+                    contentColor = colors.onPrimary
+                )
+            ) {
+                Text("Search")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    searchDate = ""
+                    appliedDate = ""
+                    searchError = ""
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = colors.primary
+                )
+            ) {
+                Text("Clear Filter")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Total Records: ${records.size}",
+            text = if (appliedDate.isBlank()) {
+                "Total Records: ${records.size}"
+            } else {
+                "Matching Records: ${filteredRecords.size}"
+            },
             fontWeight = FontWeight.Medium,
             color = colors.onBackground
         )
 
+        if (appliedDate.isNotBlank()) {
+            Text(
+                text = "Selected Date: $appliedDate",
+                fontSize = 13.sp,
+                color = colors.onSurfaceVariant
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (records.isEmpty()) {
+        if (filteredRecords.isEmpty()) {
 
             Box(
                 modifier = Modifier
@@ -68,7 +179,11 @@ fun HealthRecordsScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "No health records available.",
+                    text = if (appliedDate.isBlank()) {
+                        "No health records available."
+                    } else {
+                        "No health records found for $appliedDate."
+                    },
                     color = colors.onSurfaceVariant
                 )
             }
@@ -82,7 +197,7 @@ fun HealthRecordsScreen(
             ) {
 
                 items(
-                    items = records,
+                    items = filteredRecords,
                     key = { it.id }
                 ) { record ->
 
@@ -253,6 +368,31 @@ fun HealthRecordsScreen(
                 }
             }
         )
+    }
+}
+
+private fun isValidSearchDate(date: String): Boolean {
+
+    if (!date.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
+        return false
+    }
+
+    return try {
+
+        val formatter = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        )
+
+        formatter.isLenient = false
+
+        val parsedDate = formatter.parse(date)
+
+        parsedDate != null &&
+                formatter.format(parsedDate) == date
+
+    } catch (e: Exception) {
+        false
     }
 }
 
